@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Dashboard | XeroIMS</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+        }
+        h1 {
+            color: #333;
+        }
+        .logout {
+            margin-top: 20px;
+        }
+        a {
+            color: #4285F4;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<h1>Welcome, <span th:text="${name}">User</span>!</h1>
+<p>Email: <span th:text="${email}">example@gmail.com</span></p>
+
+<div class="logout">
+    <a href="/logout">Logout</a>
+</div>
+</body>
+</html>
