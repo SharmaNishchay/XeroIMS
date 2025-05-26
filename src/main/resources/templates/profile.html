@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Profile | XeroIMS</title>
+    <link href="https://fonts.cdnfonts.com/css/tt-octosquares-trl" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'TT Octosquares TRL', sans-serif;
+            background-color: #121212;
+            color: #eee;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 100vh;
+            width: 220px;
+            background-color: #1f1f1f;
+            padding-top: 20px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #b7ab98;
+        }
+
+        .sidebar nav a {
+            display: block;
+            padding: 12px 20px;
+            color: #b7ab98;
+            text-decoration: none;
+            font-weight: 500;
+            border-left: 4px solid transparent;
+            transition: background-color 0.3s, border-left 0.3s;
+        }
+
+        .sidebar nav a:hover,
+        .sidebar nav a.active {
+            background-color: #333;
+            border-left: 4px solid #b7ab98;
+            color: white;
+        }
+
+        .content {
+            margin-left: 220px;
+            padding: 40px;
+            min-height: 100vh;
+            background-color: #222;
+            box-sizing: border-box;
+        }
+
+        .content h1 {
+            font-weight: 700;
+            color: #b7ab98;
+            margin-bottom: 30px;
+            margin-top: 0;
+        }
+
+
+        .profile-section {
+            background-color: #2c2c2c;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.3);
+            margin-bottom: 40px;
+        }
+
+        .profile-row {
+            margin-bottom: 20px;
+        }
+
+        .profile-row strong {
+            display: inline-block;
+            width: 120px;
+            color: #ccc;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            display: inline-block;
+            margin-left: -3px;
+            margin-top: 30px;
+            padding: 10px 24px;
+            background-color: black;
+            color: #b7ab98;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #1c1c1c;
+        }
+
+        .faq-section {
+            background-color: #2c2c2c;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 0 8px rgba(0,0,0,0.3);
+        }
+
+        .faq-section h2 {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: #b7ab98;
+        }
+
+        .faq-item {
+            margin-bottom: 15px;
+        }
+
+        .faq-question {
+            cursor: pointer;
+            background-color: #3a3a3a;
+            padding: 12px 16px;
+            border-radius: 6px;
+            color: #eee;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .faq-question:hover {
+            background-color: #4a4a4a;
+        }
+
+        .faq-answer {
+            display: none;
+            padding: 12px 20px;
+            margin-top: 8px;
+            background-color: #444;
+            border-radius: 6px;
+            color: #ddd;
+            font-size: 0.95rem;
+        }
+
+        .faq-question.active + .faq-answer {
+            display: block;
+        }
+
+        .faq-question .icon {
+            width: 20px;
+            height: 20px;
+            color: #b7ab98;
+            transition: transform 0.3s ease;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar { width: 60px; }
+            .sidebar h2 { display: none; }
+            .sidebar nav a {
+                padding: 12px 10px;
+                font-size: 0;
+                position: relative;
+            }
+            .sidebar nav a::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                left: 60px;
+                top: 50%;
+                transform: translateY(-50%);
+                background-color: #333;
+                padding: 6px 10px;
+                border-radius: 4px;
+                white-space: nowrap;
+                opacity: 0;
+                color: white;
+                font-size: 14px;
+                transition: opacity 0.3s;
+            }
+            .sidebar nav a:hover::after { opacity: 1; }
+            .content { margin-left: 60px; padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+<aside class="sidebar">
+    <h2>XeroIMS</h2>
+    <nav>
+        <a href="/dashboard" data-tooltip="Dashboard">Dashboard</a>
+        <a href="/category" data-tooltip="Category">Category</a>
+        <a href="/products" data-tooltip="Products">Products</a>
+        <a href="/suppliers" data-tooltip="Suppliers">Suppliers</a>
+        <a href="/purchase" data-tooltip="Purchase">Purchase</a>
+        <a href="/sales" data-tooltip="Sales">Sales</a>
+        <a href="/billing" data-tooltip="Billing">Billing</a>
+        <a href="/stock" data-tooltip="Stock">Stock</a>
+        <a href="/reports" data-tooltip="Reports">Reports</a>
+        <a href="/profile" class="active" data-tooltip="Profile">Profile</a>
+        <a href="/settings" data-tooltip="Settings">Settings</a>
+    </nav>
+</aside>
+
+<main class="content">
+    <h1>Profile</h1>
+
+    <div class="profile-section">
+        <div class="profile-row"><strong>User ID:</strong> <span th:text="${id}">001</span></div>
+        <div class="profile-row"><strong>Name:</strong> <span th:text="${name}">John Doe</span></div>
+        <div class="profile-row"><strong>Email:</strong> <span th:text="${email}">admin@example.com</span></div>
+
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+
+    <div class="faq-section">
+        <h2>Frequently Asked Questions</h2>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <i data-lucide="plus-circle" class="icon"></i>
+                <span>How do I add new products?</span>
+            </div>
+            <div class="faq-answer">
+                Go to the Products tab in the sidebar and click on "Add New Product". Fill out the required fields and save.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <i data-lucide="plus-circle" class="icon"></i>
+                <span>How can I view inventory levels?</span>
+            </div>
+            <div class="faq-answer">
+                Navigate to the Stock section. It shows current stock quantity for all products.
+            </div>
+        </div>
+
+        <div class="faq-item">
+            <div class="faq-question">
+                <i data-lucide="plus-circle" class="icon"></i>
+                <span>Can I download monthly sales reports?</span>
+            </div>
+            <div class="faq-answer">
+                Yes, go to the Reports section and choose the "Sales Report". You can download it in PDF or Excel format.
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    lucide.createIcons();
+
+    document.querySelectorAll('.faq-question').forEach(q => {
+        q.addEventListener('click', () => {
+            const icon = q.querySelector('.icon');
+            const isActive = q.classList.toggle('active');
+            const answer = q.nextElementSibling;
+
+            if (isActive) {
+                icon.setAttribute('data-lucide', 'minus-circle');
+            } else {
+                icon.setAttribute('data-lucide', 'plus-circle');
+            }
+
+            lucide.createIcons();
+        });
+    });
+</script>
+</body>
+</html>
