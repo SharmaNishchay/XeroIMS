@@ -18,6 +18,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final CustomOAuth2UserService customOAuth2UserService;  // Add this!
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -48,6 +49,9 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth -> oauth
                         .loginPage("/login")
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
                         .defaultSuccessUrl("/dashboard", true)
                 )
                 .logout(logout -> logout
