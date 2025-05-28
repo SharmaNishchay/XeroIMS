@@ -7,9 +7,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -25,5 +28,10 @@ public class UserService {
 
         userRepository.save(user);
         return true;
+    }
+
+    // ✅ Add this method
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }
