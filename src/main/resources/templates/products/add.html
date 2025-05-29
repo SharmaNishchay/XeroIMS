@@ -29,7 +29,7 @@
     <h1>Add Product</h1>
     <div class="form-card">
         <h2>New Product Details</h2>
-        <form th:action="@{/css/add}" th:object="${productDTO}" method="post">
+        <form th:action="@{/products/add}" th:object="${productDTO}" method="post">
             <div>
                 <label for="name">Product Name</label>
                 <input type="text" id="name" th:field="*{name}" placeholder="Enter product name" required />
@@ -55,7 +55,7 @@
             </div>
             <div class="btn-group">
                 <button type="submit" class="btn-submit">Save</button>
-                <a th:href="@{/css}" class="btn-cancel">Cancel</a>
+                <a th:href="@{/products}" class="btn-cancel">Cancel</a>
             </div>
         </form>
     </div>
