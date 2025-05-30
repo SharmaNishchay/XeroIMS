@@ -41,7 +41,6 @@ public class ProductService {
             throw new IllegalArgumentException("User context must be provided.");
         }
 
-        // Check SKU uniqueness
         Optional<Product> existingProduct;
         if (user != null) {
             existingProduct = productRepository.findBySkuAndUser(dto.getSku(), user);
@@ -52,7 +51,6 @@ public class ProductService {
             throw new DuplicateProductException("Product with SKU already exists: " + dto.getSku());
         }
 
-        // Fetch category and check ownership
         Category category = categoryService.getCategoryById(dto.getCategoryId());
         if (user != null && !user.equals(category.getUser())) {
             throw new ResourceNotFoundException("Category not found for this user.");
@@ -77,7 +75,6 @@ public class ProductService {
     public Product updateProduct(Long id, ProductDTO dto) {
         Product existingProduct = getProductById(id);
 
-        // Check SKU uniqueness (allow if same product)
         Optional<Product> productBySku;
         if (existingProduct.getUser() != null) {
             productBySku = productRepository.findBySkuAndUser(dto.getSku(), existingProduct.getUser());
@@ -88,7 +85,6 @@ public class ProductService {
             throw new DuplicateProductException("Product with SKU already exists: " + dto.getSku());
         }
 
-        // Fetch category and check ownership
         Category category = categoryService.getCategoryById(dto.getCategoryId());
         if (existingProduct.getUser() != null && !existingProduct.getUser().equals(category.getUser())) {
             throw new ResourceNotFoundException("Category not found for this user.");
