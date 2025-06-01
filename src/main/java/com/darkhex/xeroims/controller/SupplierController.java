@@ -59,7 +59,6 @@ public class SupplierController {
         User user = getUser(authentication);
         OauthUser oauthUser = getOauthUser(authentication);
 
-        // Add categories for dropdown
         model.addAttribute("categories", categoryService.getAllCategories(user, oauthUser));
         return "suppliers/add";
     }
@@ -72,7 +71,6 @@ public class SupplierController {
             Model model
     ) {
         if (result.hasErrors()) {
-            // Re-populate categories on validation failure
             User user = getUser(authentication);
             OauthUser oauthUser = getOauthUser(authentication);
             model.addAttribute("categories", categoryService.getAllCategories(user, oauthUser));
@@ -87,8 +85,6 @@ public class SupplierController {
             supplierService.addSupplier(supplierDTO, user, oauthUser);
         } catch (Exception ex) {
             model.addAttribute("errorMessage", ex.getMessage());
-
-            // Add categories again to model on error
             model.addAttribute("categories", categoryService.getAllCategories(user, oauthUser));
             return "suppliers/add";
         }
@@ -107,7 +103,6 @@ public class SupplierController {
         dto.setEmail(supplier.getEmail());
         dto.setAddress(supplier.getAddress());
 
-        // If SupplierDTO has categoryId field, set it here:
         if (supplier.getCategory() != null) {
             dto.setCategoryId(supplier.getCategory().getId());
         }
@@ -117,7 +112,6 @@ public class SupplierController {
         User user = getUser(authentication);
         OauthUser oauthUser = getOauthUser(authentication);
 
-        // Add categories for dropdown in edit form
         model.addAttribute("categories", categoryService.getAllCategories(user, oauthUser));
 
         return "suppliers/edit";
@@ -132,7 +126,6 @@ public class SupplierController {
             Model model
     ) {
         if (result.hasErrors()) {
-            // Add categories again on validation error
             User user = getUser(authentication);
             OauthUser oauthUser = getOauthUser(authentication);
             model.addAttribute("categories", categoryService.getAllCategories(user, oauthUser));
@@ -145,7 +138,6 @@ public class SupplierController {
         } catch (Exception ex) {
             model.addAttribute("errorMessage", ex.getMessage());
 
-            // Add categories again on error
             User user = getUser(authentication);
             OauthUser oauthUser = getOauthUser(authentication);
             model.addAttribute("categories", categoryService.getAllCategories(user, oauthUser));
