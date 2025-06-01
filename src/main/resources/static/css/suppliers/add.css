@@ -89,13 +89,6 @@ input, select {
     background-color: #222;
     color: #b7ab98;
 }
-
-.btn-group {
-    display: flex;
-    gap: 10px;
-    margin-top: 30px;
-    justify-content: center;
-}
 .category-select {
     font-family: 'TT Octosquares TRL', sans-serif;
     width: 100%;
@@ -125,6 +118,14 @@ input, select {
 .category-select:focus {
     outline: none;
 }
+
+.btn-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 30px;
+    justify-content: center;
+}
+
 .btn-submit,
 .btn-cancel {
     display: inline-block;

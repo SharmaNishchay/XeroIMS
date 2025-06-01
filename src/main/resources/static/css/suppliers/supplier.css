@@ -14,6 +14,7 @@ body {
     background-color: #1f1f1f;
     padding-top: 20px;
     box-sizing: border-box;
+    overflow-y: auto;
 }
 
 .sidebar h2 {
@@ -44,123 +45,134 @@ body {
 .content {
     margin-left: 220px;
     padding: 40px;
-    background-color: #222;
     min-height: 100vh;
+    background-color: #222;
     box-sizing: border-box;
 }
 
 .content h1 {
     font-weight: 700;
     color: #b7ab98;
-    margin-bottom: 30px;
+    margin-bottom: 12px;
     margin-top: 0;
-}
-
-.form-card {
-    background-color: #2c2c2c;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 0 8px rgba(0,0,0,0.3);
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.form-card h2 {
-    color: #b7ab98;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 600;
-    color: #ccc;
-}
-
-input, select {
-    font-family: 'TT Octosquares TRL', sans-serif;
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 6px;
-    font-size: 15px;
-    background-color: #222;
-    color: #b7ab98;
-}
-
-.btn-group {
-    display: flex;
-    gap: 10px;
-    margin-top: 30px;
-    justify-content: center;
-}
-.category-select {
-    font-family: 'TT Octosquares TRL', sans-serif;
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: none;
-    border-radius: 6px;
-    font-size: 15px;
-    background-color: #222;
-    color: #b7ab98;
-    appearance: none;
-    cursor: pointer;
-    position: relative;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='20,50 70,100 120,50' stroke='%23b7ab98' stroke-width='20' fill='none'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 12px center;
-    background-size: 12px;
-}
-
-/* Scrollable options */
-.category-select option {
-    background-color: #1f1f1f;
-    color: #b7ab98;
-}
-
-/* Scrollbar styling (WebKit) */
-.category-select:focus {
-    outline: none;
-}
-.btn-submit,
-.btn-cancel {
     display: inline-block;
+}
+
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.search-input {
     font-family: 'TT Octosquares TRL', sans-serif;
-    padding: 10px 24px;
-    background-color: black;
-    color: #b7ab98;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 25px;
     border: none;
-    cursor: pointer;
+    outline: none;
+    width: 260px;
+    background-color: #333;
+    color: #eee;
+    font-size: 1rem;
     transition: background-color 0.3s;
 }
 
-.btn-submit:hover,
-.btn-cancel:hover {
-    background-color: #1c1c1c;
+.search-input::placeholder {
+    color: #aaa;
+}
+
+.search-input:focus {
+    background-color: #444;
+}
+
+.btn-add {
+    font-family: 'TT Octosquares TRL', sans-serif;
+    background-color: #b7ab98;
+    color: #222;
+    font-weight: 700;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+}
+
+.btn-add:hover {
+    background-color: #a3987c;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #2c2c2c;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.3);
+    overflow: hidden;
+}
+
+thead {
+    background-color: #3a3a3a;
+}
+
+thead th {
+    padding: 14px 20px;
+    text-align: left;
+    color: #b7ab98;
+    font-weight: 600;
+    user-select: none;
+}
+
+tbody tr {
+    border-bottom: 1px solid #444;
+    transition: background-color 0.3s;
+}
+
+tbody tr:hover {
+    background-color: #444;
+}
+
+tbody td {
+    padding: 14px 20px;
+    color: #eee;
+    vertical-align: middle;
+}
+
+.action-icons {
+    display: flex;
+    gap: 15px;
+}
+
+.action-icons button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #b7ab98;
+    padding: 6px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.action-icons button:hover {
+    background-color: #555;
+    color: #eee;
 }
 
 @media (max-width: 768px) {
     .sidebar {
         width: 60px;
     }
-
     .sidebar h2 {
         display: none;
     }
-
     .sidebar nav a {
-        font-size: 0;
         padding: 12px 10px;
+        font-size: 0;
         position: relative;
     }
-
     .sidebar nav a::after {
         content: attr(data-tooltip);
         position: absolute;
@@ -176,13 +188,19 @@ input, select {
         font-size: 14px;
         transition: opacity 0.3s;
     }
-
     .sidebar nav a:hover::after {
         opacity: 1;
     }
-
     .content {
         margin-left: 60px;
         padding: 20px;
+    }
+    .top-bar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 15px;
+    }
+    .search-input, .btn-add {
+        width: 100%;
     }
 }
