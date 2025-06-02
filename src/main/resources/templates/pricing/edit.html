@@ -205,22 +205,22 @@
     <h1>Edit Pricing</h1>
     <div class="form-card">
         <h2>Update Pricing Details</h2>
-        <form th:action="@{/pricing/update/{id}(id=${pricingDTO.id})}" th:object="${pricingDTO}" method="post">
+        <form th:action="@{/pricing/update/{id}(id=${pricingDTO.id})}" th:object="${pricingDTO}" method="post" id="pricingForm">
             <input type="hidden" th:field="*{id}" />
             <div>
                 <label for="category">Category</label>
-                <select id="category" name="categoryId" required class="category-select">
+                <select id="category" name="selectedCategoryId" required class="category-select" onchange="this.form.action='/pricing/loadProducts'; this.form.submit()">
                     <option value="" disabled>Select a category</option>
                     <option th:each="category : ${categories}"
                             th:value="${category.id}"
                             th:text="${category.name}"
-                            th:selected="${category.id == pricingDTO.categoryId}">
+                            th:selected="${category.id == selectedCategoryId}">
                     </option>
                 </select>
             </div>
             <div>
                 <label for="product">Product</label>
-                <select id="product" th:field="*{productId}" required class="category-select">
+                <select id="product" th:field="*{productId}" required class="category-select" th:disabled="${products == null or products.isEmpty()}">
                     <option value="" disabled>Select a product</option>
                     <option th:each="product : ${products}"
                             th:value="${product.id}"
@@ -245,7 +245,7 @@
                 <input type="number" id="price" th:field="*{price}" step="0.01" min="0" required />
             </div>
             <div class="btn-group">
-                <button type="submit" class="btn-submit">Update</button>
+                <button type="submit" class="btn-submit" th:attr="formaction=@{/pricing/update/{id}(id=${pricingDTO.id})}">Update</button>
                 <a th:href="@{/pricing}" class="btn-cancel">Cancel</a>
             </div>
         </form>

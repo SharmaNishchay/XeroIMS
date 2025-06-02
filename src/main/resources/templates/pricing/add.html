@@ -222,12 +222,12 @@
         <form th:action="@{/pricing/add}" th:object="${pricingDTO}" method="post" id="pricingForm">
             <div>
                 <label for="category">Category</label>
-                <select id="category" name="categoryId" required class="category-select" onchange="this.form.action='/pricing/loadProducts'; this.form.submit()">
+                <select id="category" name="selectedCategoryId" required class="category-select" onchange="this.form.action='/pricing/loadProducts'; this.form.submit()">
                     <option value="" disabled selected>Select a category</option>
                     <option th:each="category : ${categories}"
                             th:value="${category.id}"
                             th:text="${category.name}"
-                            th:selected="${category.id == pricingDTO.categoryId}">
+                            th:selected="${category.id == selectedCategoryId}">
                     </option>
                 </select>
             </div>
@@ -270,3 +270,4 @@
 </script>
 </body>
 </html>
+

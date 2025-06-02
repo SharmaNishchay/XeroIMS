@@ -130,4 +130,22 @@ public class SupplierService {
         }
         supplierRepository.deleteById(id);
     }
+
+    public List<Supplier> getSuppliersByCategory(Long categoryId, User user, OauthUser oauthUser) {
+        // First get all suppliers belonging to this user
+        List<Supplier> userSuppliers;
+        if (user != null) {
+            userSuppliers = supplierRepository.findAllByUserOrderByNameAsc(user);
+        } else if (oauthUser != null) {
+            userSuppliers = supplierRepository.findAllByOauthUserOrderByNameAsc(oauthUser);
+        } else {
+            return List.of();
+        }
+
+        // Then filter to only include suppliers that belong to the category
+        Category category = categoryService.getCategoryById(categoryId);
+        return userSuppliers.stream()
+                .filter(supplier -> supplier.getCategory().equals(category))
+                .toList();
+    }
 }
