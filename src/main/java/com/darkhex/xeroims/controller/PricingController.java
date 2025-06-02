@@ -100,14 +100,21 @@ public class PricingController {
         OauthUser oauthUser = getOauthUser(authentication);
 
         model.addAttribute("categories", categoryService.getAllCategories(user, oauthUser));
-        model.addAttribute("suppliers", supplierService.getAllSuppliers(user, oauthUser));
-        model.addAttribute("products", selectedCategoryId != null
-                ? productService.getAllProducts(user, oauthUser) // Temporary fallback
-                : productService.getAllProducts(user, oauthUser));
+
+        if (selectedCategoryId != null) {
+            // Filter both products and suppliers by the selected category
+            model.addAttribute("products", productService.getProductsByCategory(selectedCategoryId, user, oauthUser));
+            model.addAttribute("suppliers", supplierService.getSuppliersByCategory(selectedCategoryId, user, oauthUser));
+        } else {
+            // No category selected, show all products and suppliers
+            model.addAttribute("products", productService.getAllProducts(user, oauthUser));
+            model.addAttribute("suppliers", supplierService.getAllSuppliers(user, oauthUser));
+        }
+
         model.addAttribute("selectedCategoryId", selectedCategoryId);
         model.addAttribute("pricingDTO", pricingDTO);
 
-        return "pricing/add";
+        return pricingDTO.getId() != null ? "pricing/edit" : "pricing/add";
     }
 
     @PostMapping("/add")
@@ -123,10 +130,17 @@ public class PricingController {
 
         if (result.hasErrors()) {
             model.addAttribute("categories", categoryService.getAllCategories(user, oauthUser));
-            model.addAttribute("suppliers", supplierService.getAllSuppliers(user, oauthUser));
-            model.addAttribute("products", selectedCategoryId != null
-                    ? productService.getAllProducts(user, oauthUser) // Temporary fallback
-                    : productService.getAllProducts(user, oauthUser));
+
+            if (selectedCategoryId != null) {
+                // Filter both products and suppliers by the selected category
+                model.addAttribute("products", productService.getProductsByCategory(selectedCategoryId, user, oauthUser));
+                model.addAttribute("suppliers", supplierService.getSuppliersByCategory(selectedCategoryId, user, oauthUser));
+            } else {
+                // No category selected, show all products and suppliers
+                model.addAttribute("products", productService.getAllProducts(user, oauthUser));
+                model.addAttribute("suppliers", supplierService.getAllSuppliers(user, oauthUser));
+            }
+
             model.addAttribute("selectedCategoryId", selectedCategoryId);
             return "pricing/add";
         }
@@ -136,10 +150,17 @@ public class PricingController {
         } catch (Exception ex) {
             model.addAttribute("errorMessage", ex.getMessage());
             model.addAttribute("categories", categoryService.getAllCategories(user, oauthUser));
-            model.addAttribute("suppliers", supplierService.getAllSuppliers(user, oauthUser));
-            model.addAttribute("products", selectedCategoryId != null
-                    ? productService.getAllProducts(user, oauthUser) // Temporary fallback
-                    : productService.getAllProducts(user, oauthUser));
+
+            if (selectedCategoryId != null) {
+                // Filter both products and suppliers by the selected category
+                model.addAttribute("products", productService.getProductsByCategory(selectedCategoryId, user, oauthUser));
+                model.addAttribute("suppliers", supplierService.getSuppliersByCategory(selectedCategoryId, user, oauthUser));
+            } else {
+                // No category selected, show all products and suppliers
+                model.addAttribute("products", productService.getAllProducts(user, oauthUser));
+                model.addAttribute("suppliers", supplierService.getAllSuppliers(user, oauthUser));
+            }
+
             model.addAttribute("selectedCategoryId", selectedCategoryId);
             return "pricing/add";
         }
@@ -165,10 +186,17 @@ public class PricingController {
                 : null;
 
         model.addAttribute("categories", categoryService.getAllCategories(user, oauthUser));
-        model.addAttribute("suppliers", supplierService.getAllSuppliers(user, oauthUser));
-        model.addAttribute("products", selectedCategoryId != null
-                ? productService.getAllProducts(user, oauthUser) // Temporary fallback
-                : productService.getAllProducts(user, oauthUser));
+
+        if (selectedCategoryId != null) {
+            // Filter both products and suppliers by the selected category
+            model.addAttribute("products", productService.getProductsByCategory(selectedCategoryId, user, oauthUser));
+            model.addAttribute("suppliers", supplierService.getSuppliersByCategory(selectedCategoryId, user, oauthUser));
+        } else {
+            // No category selected, show all products and suppliers
+            model.addAttribute("products", productService.getAllProducts(user, oauthUser));
+            model.addAttribute("suppliers", supplierService.getAllSuppliers(user, oauthUser));
+        }
+
         model.addAttribute("selectedCategoryId", selectedCategoryId);
         model.addAttribute("pricingDTO", dto);
 
@@ -189,10 +217,17 @@ public class PricingController {
 
         if (result.hasErrors()) {
             model.addAttribute("categories", categoryService.getAllCategories(user, oauthUser));
-            model.addAttribute("suppliers", supplierService.getAllSuppliers(user, oauthUser));
-            model.addAttribute("products", selectedCategoryId != null
-                    ? productService.getAllProducts(user, oauthUser) // Temporary fallback
-                    : productService.getAllProducts(user, oauthUser));
+
+            if (selectedCategoryId != null) {
+                // Filter both products and suppliers by the selected category
+                model.addAttribute("products", productService.getProductsByCategory(selectedCategoryId, user, oauthUser));
+                model.addAttribute("suppliers", supplierService.getSuppliersByCategory(selectedCategoryId, user, oauthUser));
+            } else {
+                // No category selected, show all products and suppliers
+                model.addAttribute("products", productService.getAllProducts(user, oauthUser));
+                model.addAttribute("suppliers", supplierService.getAllSuppliers(user, oauthUser));
+            }
+
             model.addAttribute("selectedCategoryId", selectedCategoryId);
             return "pricing/edit";
         }
@@ -202,10 +237,17 @@ public class PricingController {
         } catch (Exception ex) {
             model.addAttribute("errorMessage", ex.getMessage());
             model.addAttribute("categories", categoryService.getAllCategories(user, oauthUser));
-            model.addAttribute("suppliers", supplierService.getAllSuppliers(user, oauthUser));
-            model.addAttribute("products", selectedCategoryId != null
-                    ? productService.getAllProducts(user, oauthUser) // Temporary fallback
-                    : productService.getAllProducts(user, oauthUser));
+
+            if (selectedCategoryId != null) {
+                // Filter both products and suppliers by the selected category
+                model.addAttribute("products", productService.getProductsByCategory(selectedCategoryId, user, oauthUser));
+                model.addAttribute("suppliers", supplierService.getSuppliersByCategory(selectedCategoryId, user, oauthUser));
+            } else {
+                // No category selected, show all products and suppliers
+                model.addAttribute("products", productService.getAllProducts(user, oauthUser));
+                model.addAttribute("suppliers", supplierService.getAllSuppliers(user, oauthUser));
+            }
+
             model.addAttribute("selectedCategoryId", selectedCategoryId);
             return "pricing/edit";
         }
@@ -219,3 +261,4 @@ public class PricingController {
         return "redirect:/pricing";
     }
 }
+

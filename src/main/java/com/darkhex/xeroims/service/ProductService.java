@@ -109,4 +109,14 @@ public class ProductService {
         }
         productRepository.deleteById(id);
     }
+
+    public List<Product> getProductsByCategory(Long categoryId, User user, OauthUser oauthUser) {
+        Category category = categoryService.getCategoryById(categoryId);
+        // Verify the category belongs to this user
+        if ((user != null && !user.equals(category.getUser())) ||
+            (oauthUser != null && !oauthUser.equals(category.getOauthUser()))) {
+            return List.of(); // Return empty list if category doesn't belong to user
+        }
+        return productRepository.findAllByCategory(category);
+    }
 }
