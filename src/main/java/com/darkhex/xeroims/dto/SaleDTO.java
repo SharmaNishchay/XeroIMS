@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-public class PurchaseDTO {
+public class SaleDTO {
 
     private Long id;
 
@@ -21,10 +21,8 @@ public class PurchaseDTO {
 
     private String productName;
 
-    @NotNull(message = "Supplier ID is required")
-    private Long supplierId;
-
-    private String supplierName;
+    @NotNull(message = "Customer name is required")
+    private String customerName;
 
     @NotNull(message = "Quantity is required")
     @Min(value = 1, message = "Quantity must be at least 1")
@@ -37,7 +35,7 @@ public class PurchaseDTO {
     private Status status = Status.PENDING;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate purchaseDate;
+    private LocalDate salesDate;
 
     private Long userId;
 
@@ -45,4 +43,3 @@ public class PurchaseDTO {
 
     private Long categoryId;
 }
-
