@@ -85,4 +85,13 @@ public class PricingService {
         }
         pricingRepository.deleteById(id);
     }
+
+    public Optional<Pricing> findByProductAndSupplier(Long productId, Long supplierId, User user, OauthUser oauthUser) {
+        if (user != null) {
+            return pricingRepository.findByProductIdAndSupplierIdAndUser(productId, supplierId, user);
+        } else if (oauthUser != null) {
+            return pricingRepository.findByProductIdAndSupplierIdAndOauthUser(productId, supplierId, oauthUser);
+        }
+        return Optional.empty();
+    }
 }
