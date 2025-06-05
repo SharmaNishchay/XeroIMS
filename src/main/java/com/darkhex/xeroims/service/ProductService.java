@@ -63,7 +63,7 @@ public class ProductService {
         product.setName(dto.getName());
         product.setSku(dto.getSku());
         product.setPrice(dto.getPrice());
-        product.setQuantity(0);
+        product.setQuantity(dto.getQuantity());
         product.setCategory(category);
         product.setUser(user);
         product.setOauthUser(oauthUser);
@@ -96,6 +96,7 @@ public class ProductService {
         existingProduct.setName(dto.getName());
         existingProduct.setSku(dto.getSku());
         existingProduct.setPrice(dto.getPrice());
+        existingProduct.setQuantity(dto.getQuantity());
         existingProduct.setCategory(category);
 
         return productRepository.save(existingProduct);
@@ -111,9 +112,10 @@ public class ProductService {
 
     public List<Product> getProductsByCategory(Long categoryId, User user, OauthUser oauthUser) {
         Category category = categoryService.getCategoryById(categoryId);
+        // Verify the category belongs to this user
         if ((user != null && !user.equals(category.getUser())) ||
             (oauthUser != null && !oauthUser.equals(category.getOauthUser()))) {
-            return List.of();
+            return List.of(); // Return empty list if category doesn't belong to user
         }
         return productRepository.findAllByCategory(category);
     }
