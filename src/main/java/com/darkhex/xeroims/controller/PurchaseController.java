@@ -5,6 +5,7 @@ import com.darkhex.xeroims.enums.Status;
 import com.darkhex.xeroims.exception.ResourceNotFoundException;
 import com.darkhex.xeroims.model.OauthUser;
 import com.darkhex.xeroims.model.Pricing;
+import com.darkhex.xeroims.model.Product;
 import com.darkhex.xeroims.model.User;
 import com.darkhex.xeroims.service.*;
 import jakarta.validation.Valid;
@@ -134,7 +135,6 @@ public class PurchaseController {
         purchaseDTO.setProductId(productId);
         purchaseDTO.setSupplierId(supplierId);
 
-        // Automatically fetch price when both product and supplier are selected
         if (productId != null && supplierId != null) {
             Optional<Pricing> pricing = pricingService.findByProductAndSupplier(
                     productId, supplierId, user, oauthUser);
@@ -142,15 +142,30 @@ public class PurchaseController {
             if (pricing.isPresent()) {
                 purchaseDTO.setPrice(pricing.get().getPrice());
 
-                // Calculate total price if quantity is available
                 if (purchaseDTO.getQuantity() != null && purchaseDTO.getQuantity() > 0) {
                     BigDecimal totalPrice = pricing.get().getPrice()
                             .multiply(new BigDecimal(purchaseDTO.getQuantity()));
                     purchaseDTO.setTotalPrice(totalPrice);
                 }
+            } else {
+                try {
+                    Product product = productService.getProductById(productId);
+                    purchaseDTO.setPrice(product.getPrice());
+
+                    if (purchaseDTO.getQuantity() != null && purchaseDTO.getQuantity() > 0) {
+                        BigDecimal totalPrice = product.getPrice()
+                                .multiply(new BigDecimal(purchaseDTO.getQuantity()));
+                        purchaseDTO.setTotalPrice(totalPrice);
+                    }
+
+                    model.addAttribute("warningMessage", "Using product's base price as no specific pricing found for this supplier.");
+                } catch (Exception e) {
+                    purchaseDTO.setPrice(null);
+                    purchaseDTO.setTotalPrice(null);
+                    model.addAttribute("errorMessage", "Unable to find pricing information.");
+                }
             }
         } else {
-            // Reset price and total price if either product or supplier is not selected
             purchaseDTO.setPrice(null);
             purchaseDTO.setTotalPrice(null);
         }
@@ -166,7 +181,6 @@ public class PurchaseController {
         User user = getUser(authentication);
         OauthUser oauthUser = getOauthUser(authentication);
 
-        // Only fetch price if both product and supplier are selected
         if (purchaseDTO.getProductId() != null && purchaseDTO.getSupplierId() != null) {
             Optional<Pricing> pricing = pricingService.findByProductAndSupplier(
                     purchaseDTO.getProductId(),
@@ -176,8 +190,6 @@ public class PurchaseController {
 
             if (pricing.isPresent()) {
                 purchaseDTO.setPrice(pricing.get().getPrice());
-
-                // Calculate total price if quantity is available
                 if (purchaseDTO.getQuantity() != null && purchaseDTO.getQuantity() > 0) {
                     BigDecimal totalPrice = pricing.get().getPrice()
                             .multiply(new BigDecimal(purchaseDTO.getQuantity()));
@@ -185,8 +197,6 @@ public class PurchaseController {
                 }
             }
         }
-
-        // Reload all form data
         model.addAttribute("categories", categoryService.getAllCategories(user, oauthUser));
 
         if (purchaseDTO.getCategoryId() != null) {
@@ -208,13 +218,11 @@ public class PurchaseController {
         User user = getUser(authentication);
         OauthUser oauthUser = getOauthUser(authentication);
 
-        // Calculate total price if price and quantity are available
         if (purchaseDTO.getPrice() != null && purchaseDTO.getQuantity() != null && purchaseDTO.getQuantity() > 0) {
             BigDecimal totalPrice = purchaseDTO.getPrice().multiply(new BigDecimal(purchaseDTO.getQuantity()));
             purchaseDTO.setTotalPrice(totalPrice);
         }
 
-        // Reload all form data
         model.addAttribute("categories", categoryService.getAllCategories(user, oauthUser));
 
         if (purchaseDTO.getCategoryId() != null) {
@@ -255,7 +263,6 @@ public class PurchaseController {
         }
 
         try {
-            // Fetch price if not already set
             if (purchaseDTO.getPrice() == null) {
                 Optional<Pricing> pricing = pricingService.findByProductAndSupplier(
                         purchaseDTO.getProductId(), purchaseDTO.getSupplierId(), user, oauthUser);
@@ -265,7 +272,11 @@ public class PurchaseController {
                     BigDecimal totalPrice = pricing.get().getPrice().multiply(new BigDecimal(purchaseDTO.getQuantity()));
                     purchaseDTO.setTotalPrice(totalPrice);
                 } else {
-                    throw new ResourceNotFoundException("No pricing found for this product-supplier combination");
+                    Product product = productService.getProductById(purchaseDTO.getProductId());
+                    purchaseDTO.setPrice(product.getPrice());
+                    BigDecimal totalPrice = product.getPrice().multiply(new BigDecimal(purchaseDTO.getQuantity()));
+                    purchaseDTO.setTotalPrice(totalPrice);
+                    redirectAttributes.addFlashAttribute("warningMessage", "Purchase created using product's base price as no supplier-specific pricing was found.");
                 }
             }
 
