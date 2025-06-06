@@ -577,7 +577,7 @@
       </h3>
       <p class="summary-value" th:text="${pendingSalesCount}">5</p>
       <div class="summary-trend">
-        <span th:text="${'₹' + pendingSalesAmount}">₹25,800</span>
+        <span th:text="${'$' + pendingSalesAmount}">$25,800</span>
       </div>
     </div>
     <div class="summary-card pending-purchases">
@@ -586,34 +586,34 @@
       </h3>
       <p class="summary-value" th:text="${pendingPurchasesCount}">3</p>
       <div class="summary-trend">
-        <span th:text="${'₹' + pendingPurchasesAmount}">₹18,450</span>
+        <span th:text="${'$' + pendingPurchasesAmount}">$18,450</span>
       </div>
     </div>
     <div class="summary-card balance">
       <h3 class="summary-title">
         <i data-lucide="wallet" size="18"></i>Balance
       </h3>
-      <p class="summary-value" th:text="${'₹' + balance}">₹1,35,750</p>
+      <p class="summary-value" th:text="${'$' + balance}">$1,35,750</p>
     </div>
     <div class="summary-card profit">
       <h3 class="summary-title">
         <i data-lucide="bar-chart-2" size="18"></i>Profit
       </h3>
-      <p class="summary-value" th:text="${'₹' + profit}">₹42,800</p>
-<!--      <div class="summary-trend trend-up">-->
-<!--        <i data-lucide="trending-up" size="14"></i>-->
-<!--        <span>+12.5% this month</span>-->
-<!--      </div>-->
+      <p class="summary-value" th:text="${'$' + profit}">$42,800</p>
+      <!--      <div class="summary-trend trend-up">-->
+      <!--        <i data-lucide="trending-up" size="14"></i>-->
+      <!--        <span>+12.5% this month</span>-->
+      <!--      </div>-->
     </div>
     <div class="summary-card expenses">
       <h3 class="summary-title">
         <i data-lucide="credit-card" size="18"></i>Expenses
       </h3>
-      <p class="summary-value" th:text="${'₹' + expenses}">₹89,350</p>
-<!--      <div class="summary-trend trend-down">-->
-<!--        <i data-lucide="trending-down" size="14"></i>-->
-<!--        <span>-3.8% this month</span>-->
-<!--      </div>-->
+      <p class="summary-value" th:text="${'$' + expenses}">$89,350</p>
+      <!--      <div class="summary-trend trend-down">-->
+      <!--        <i data-lucide="trending-down" size="14"></i>-->
+      <!--        <span>-3.8% this month</span>-->
+      <!--      </div>-->
     </div>
   </div>
 
@@ -678,7 +678,7 @@
         <td th:text="${purchase.productName}"></td>
         <td th:text="${purchase.supplierName}"></td>
         <td th:text="${purchase.quantity}"></td>
-        <td th:text="${'₹' + purchase.totalPrice}"></td>
+        <td th:text="${'$' + purchase.totalPrice}"></td>
         <td>
             <span th:class="'status ' + ${purchase.status.name() == 'PENDING' ? 'status-pending' : (purchase.status.name() == 'COMPLETED' ? 'status-approved' : 'status-cancelled')}"
                   th:text="${purchase.status}"></span>
@@ -774,7 +774,7 @@
         <td th:text="${sale.productName}"></td>
         <td th:text="${sale.customerName}"></td>
         <td th:text="${sale.quantity}"></td>
-        <td th:text="${'₹' + sale.totalPrice}"></td>
+        <td th:text="${'$' + sale.totalPrice}"></td>
         <td>
             <span th:class="'status ' + ${sale.status.name() == 'PENDING' ? 'status-pending' : (sale.status.name() == 'COMPLETED' ? 'status-approved' : 'status-cancelled')}"
                   th:text="${sale.status}"></span>
@@ -815,6 +815,5 @@
 </script>
 </body>
 </html>
-
 
 

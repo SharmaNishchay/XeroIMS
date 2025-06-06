@@ -257,7 +257,7 @@
     <tr th:each="pricing : ${pricings}">
       <td th:text="${pricing.product.name}">Widget A</td>
       <td th:text="${pricing.supplier.name}">Supplier X</td>
-      <td th:text="'₹' + ${pricing.price}">₹10.50</td>
+      <td th:text="'$' + ${pricing.price}">$10.50</td>
       <td>
         <div class="action-icons">
           <a th:href="@{/pricing/edit/{id}(id=${pricing.id})}" title="Edit">
