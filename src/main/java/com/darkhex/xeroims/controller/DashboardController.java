@@ -4,6 +4,18 @@ import com.darkhex.xeroims.model.OauthUser;
 import com.darkhex.xeroims.model.User;
 import com.darkhex.xeroims.repository.OauthUserRepository;
 import com.darkhex.xeroims.repository.UserRepository;
+import com.darkhex.xeroims.repository.ProductRepository;
+import com.darkhex.xeroims.repository.CategoryRepository;
+import com.darkhex.xeroims.repository.SupplierRepository;
+import com.darkhex.xeroims.repository.SaleRepository;
+import com.darkhex.xeroims.repository.PurchaseRepository;
+import com.darkhex.xeroims.model.Product;
+import com.darkhex.xeroims.model.Category;
+import com.darkhex.xeroims.model.Supplier;
+import com.darkhex.xeroims.model.Sale;
+import com.darkhex.xeroims.model.Purchase;
+import com.darkhex.xeroims.dto.DashboardDTO;
+import com.darkhex.xeroims.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -12,6 +24,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.security.Principal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Controller
@@ -22,6 +36,20 @@ public class DashboardController {
 
     @Autowired
     private OauthUserRepository oauthUserRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
+    @Autowired
+    private SupplierRepository supplierRepository;
+    @Autowired
+    private SaleRepository saleRepository;
+    @Autowired
+    private PurchaseRepository purchaseRepository;
+
+    @Autowired
+    private DashboardService dashboardService;
 
     @GetMapping("/")
     public String home() {
@@ -37,19 +65,22 @@ public class DashboardController {
     public String dashboard(Model model, Principal principal) {
         String name = "User";
         String email = "Not provided";
-
+        User user = null;
+        OauthUser oauthUser = null;
         if (principal instanceof OAuth2AuthenticationToken oauthToken) {
             OAuth2User oAuth2User = oauthToken.getPrincipal();
             name = oAuth2User.getAttribute("name");
             email = oAuth2User.getAttribute("email");
+            oauthUser = oauthUserRepository.findByEmail(email).orElse(null);
         } else if (principal != null) {
             email = principal.getName();
             name = email;
+            user = userRepository.findByEmail(email).orElse(null);
         }
-
         model.addAttribute("name", name);
         model.addAttribute("email", email);
-
+        DashboardDTO dashboardDTO = dashboardService.getDashboardData(user, oauthUser);
+        model.addAttribute("dashboard", dashboardDTO);
         return "dashboard";
     }
 

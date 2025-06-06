@@ -1,6 +1,7 @@
 package com.darkhex.xeroims.service;
 
 import com.darkhex.xeroims.dto.SaleDTO;
+import com.darkhex.xeroims.enums.Status;
 import com.darkhex.xeroims.exception.ResourceNotFoundException;
 import com.darkhex.xeroims.model.*;
 import com.darkhex.xeroims.repository.PricingRepository;
@@ -48,8 +49,8 @@ public class SaleService {
         Product product = productRepository.findById(dto.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + dto.getProductId()));
 
-        // Check if there's enough inventory
-        if (product.getQuantity() < dto.getQuantity()) {
+        // Check if there's enough inventory only if the sale status is COMPLETED
+        if (dto.getStatus() == Status.COMPLETED && product.getQuantity() < dto.getQuantity()) {
             throw new IllegalArgumentException("Not enough inventory. Available: " + product.getQuantity());
         }
 
@@ -90,10 +91,6 @@ public class SaleService {
                 oauthUser
         );
 
-        // Update product inventory by reducing the quantity
-        product.setQuantity(product.getQuantity() - dto.getQuantity());
-        productRepository.save(product);
-
         return saleRepository.save(sale);
     }
 
@@ -101,10 +98,12 @@ public class SaleService {
     public void deleteSale(Long id) {
         Sale sale = getSaleById(id);
 
-        // Revert inventory change
-        Product product = sale.getProduct();
-        product.setQuantity(product.getQuantity() + sale.getQuantity());
-        productRepository.save(product);
+        // Only revert inventory change if the sale was completed
+        if (sale.getStatus() == Status.COMPLETED) {
+            Product product = sale.getProduct();
+            product.setQuantity(product.getQuantity() + sale.getQuantity());
+            productRepository.save(product);
+        }
 
         saleRepository.deleteById(id);
     }

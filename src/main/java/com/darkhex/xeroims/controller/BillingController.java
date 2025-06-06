@@ -144,6 +144,8 @@ public class BillingController {
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "Failed to approve purchase. It may no longer be pending.");
             }
+        } catch (BillingService.InsufficientFundsException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Insufficient Funds");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error approving purchase: " + e.getMessage());
         }
@@ -178,6 +180,8 @@ public class BillingController {
             } else {
                 redirectAttributes.addFlashAttribute("errorMessage", "Failed to approve sale. It may no longer be pending or there may be insufficient stock.");
             }
+        } catch (BillingService.InsufficientProductException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Insufficient Product");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error approving sale: " + e.getMessage());
         }
@@ -234,7 +238,7 @@ public class BillingController {
         Sheet sheet = workbook.createSheet("Purchases");
 
         Row headerRow = sheet.createRow(0);
-        String[] headers = {"ID", "Date", "Product", "Supplier", "Quantity", "Total Amount", "Status"};
+        String[] headers = {"Date", "Product", "Supplier", "Quantity", "Total Amount", "Status"};
         CellStyle headerStyle = workbook.createCellStyle();
         Font font = workbook.createFont();
         font.setBold(true);
@@ -249,13 +253,12 @@ public class BillingController {
         int rowNum = 1;
         for (PurchaseDTO purchase : purchases) {
             Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(purchase.getId());
-            row.createCell(1).setCellValue(purchase.getPurchaseDate().format(dateFormatter));
-            row.createCell(2).setCellValue(purchase.getProductName());
-            row.createCell(3).setCellValue(purchase.getSupplierName());
-            row.createCell(4).setCellValue(purchase.getQuantity());
-            row.createCell(5).setCellValue(purchase.getTotalPrice().toString());
-            row.createCell(6).setCellValue(purchase.getStatus().toString());
+            row.createCell(0).setCellValue(purchase.getPurchaseDate().format(dateFormatter));
+            row.createCell(1).setCellValue(purchase.getProductName());
+            row.createCell(2).setCellValue(purchase.getSupplierName());
+            row.createCell(3).setCellValue(purchase.getQuantity());
+            row.createCell(4).setCellValue(purchase.getTotalPrice().toString());
+            row.createCell(5).setCellValue(purchase.getStatus().toString());
         }
 
         for (int i = 0; i < headers.length; i++) {
@@ -289,7 +292,7 @@ public class BillingController {
         Sheet sheet = workbook.createSheet("Sales");
 
         Row headerRow = sheet.createRow(0);
-        String[] headers = {"ID", "Date", "Product", "Customer", "Quantity", "Total Amount", "Status"};
+        String[] headers = {"Date", "Product", "Customer", "Quantity", "Total Amount", "Status"};
         CellStyle headerStyle = workbook.createCellStyle();
         Font font = workbook.createFont();
         font.setBold(true);
@@ -304,13 +307,12 @@ public class BillingController {
         int rowNum = 1;
         for (SaleDTO sale : sales) {
             Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(sale.getId());
-            row.createCell(1).setCellValue(sale.getSalesDate().format(dateFormatter));
-            row.createCell(2).setCellValue(sale.getProductName());
-            row.createCell(3).setCellValue(sale.getCustomerName());
-            row.createCell(4).setCellValue(sale.getQuantity());
-            row.createCell(5).setCellValue(sale.getTotalPrice().toString());
-            row.createCell(6).setCellValue(sale.getStatus().toString());
+            row.createCell(0).setCellValue(sale.getSalesDate().format(dateFormatter));
+            row.createCell(1).setCellValue(sale.getProductName());
+            row.createCell(2).setCellValue(sale.getCustomerName());
+            row.createCell(3).setCellValue(sale.getQuantity());
+            row.createCell(4).setCellValue(sale.getTotalPrice().toString());
+            row.createCell(5).setCellValue(sale.getStatus().toString());
         }
 
         for (int i = 0; i < headers.length; i++) {
