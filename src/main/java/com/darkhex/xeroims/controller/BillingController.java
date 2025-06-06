@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -196,6 +197,19 @@ public class BillingController {
             }
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorMessage", "Error cancelling sale: " + e.getMessage());
+        }
+        return "redirect:/billing";
+    }
+
+    @PostMapping("/add-balance")
+    public String addBalance(@RequestParam("amount") BigDecimal amount, Authentication authentication, RedirectAttributes redirectAttributes) {
+        User user = getUser(authentication);
+        OauthUser oauthUser = getOauthUser(authentication);
+        try {
+            billingService.addBalance(user, oauthUser, amount);
+            redirectAttributes.addFlashAttribute("successMessage", "Balance added successfully!");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Failed to add balance: " + e.getMessage());
         }
         return "redirect:/billing";
     }
@@ -427,5 +441,10 @@ public class BillingController {
             filteredSales : filteredSales.subList(start, end);
 
         return new PageImpl<>(pagedSales, pageable, filteredSales.size());
+    }
+
+    @GetMapping("/add-balance")
+    public String showAddBalanceForm() {
+        return "addBalance";
     }
 }
