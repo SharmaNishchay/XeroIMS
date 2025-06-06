@@ -1,6 +1,7 @@
 package com.darkhex.xeroims.service;
 
 import com.darkhex.xeroims.dto.PurchaseDTO;
+import com.darkhex.xeroims.enums.Status;
 import com.darkhex.xeroims.exception.ResourceNotFoundException;
 import com.darkhex.xeroims.model.*;
 import com.darkhex.xeroims.repository.PricingRepository;
@@ -98,18 +99,19 @@ public class PurchaseService {
                 oauthUser
         );
 
-        product.setQuantity(product.getQuantity() + dto.getQuantity());
-        productRepository.save(product);
-
         return purchaseRepository.save(purchase);
     }
 
     @Transactional
     public void deletePurchase(Long id) {
         Purchase purchase = getPurchaseById(id);
-        Product product = purchase.getProduct();
-        product.setQuantity(product.getQuantity() - purchase.getQuantity());
-        productRepository.save(product);
+
+        // Only update product quantity if the purchase was completed
+        if (purchase.getStatus() == Status.COMPLETED) {
+            Product product = purchase.getProduct();
+            product.setQuantity(product.getQuantity() - purchase.getQuantity());
+            productRepository.save(product);
+        }
 
         purchaseRepository.deleteById(id);
     }

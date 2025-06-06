@@ -333,215 +333,84 @@
       color: #ff5252;
     }
 
-    .summary-grid {
-      display: grid;
-      grid-template-columns: 0.8fr 0.8fr 1.1fr 1.1fr 1.1fr;
-      gap: 15px;
+    /* Dashboard-style Financial Cards */
+    .financial-summary {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 1rem;
       margin-bottom: 30px;
+      justify-content: center;
+      align-items: stretch;
+      width: 100%;
     }
-
-    .summary-card {
-      background-color: #2c2c2c;
-      border-radius: 10px;
-      padding: 18px 22px;
-      box-shadow: 0 0 8px rgba(0,0,0,0.3);
+    .financial-card {
+      background: linear-gradient(135deg, #232526 0%, #414345 100%);
+      box-shadow: 0 4px 24px 0 rgba(0,0,0,0.25);
+      padding: 1.2rem 1rem;
+      border-radius: 14px;
+      min-width: 0;
+      max-width: 180px;
+      flex: 1 1 0;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      position: relative;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .financial-card:hover {
+      transform: translateY(-6px) scale(1.03);
+      box-shadow: 0 8px 32px 0 rgba(0,0,0,0.35);
+    }
+    .financial-icon {
+      background: #232526;
+      border-radius: 50%;
+      padding: 0.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px 0 rgba(0,0,0,0.15);
+      min-width: 32px;
+      min-height: 32px;
+    }
+    .financial-info {
+      width: 100%;
+      min-width: 0;
       display: flex;
       flex-direction: column;
-      transition: transform 0.2s, box-shadow 0.2s;
-      height: 120px;
+      justify-content: center;
+      align-items: flex-start;
+    }
+    .financial-title, .financial-value, .summary-trend {
       width: 100%;
-      box-sizing: border-box;
+      min-width: 0;
+      text-align: left;
+      word-break: break-word;
     }
-
-    .summary-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
-    }
-
-    .summary-title {
-      color: #b7ab98;
-      font-size: 0.9rem;
-      font-weight: 600;
-      margin: 0 0 10px 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      height: 20px;
-    }
-
-    .summary-value {
-      font-size: 1.6rem;
-      font-weight: 700;
-      margin: 0;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .summary-trend {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      margin-top: 10px;
-      font-size: 0.85rem;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .trend-up {
-      color: #66bb6a;
-    }
-
-    .trend-down {
-      color: #ef5350;
-    }
-
-    .pending-sales {
-      border-left: 4px solid #8e24aa;
-    }
-
-    .pending-purchases {
-      border-left: 4px solid #ffa726;
-    }
-
-    .balance {
-      border-left: 4px solid #29b6f6;
-    }
-
-    .profit {
-      border-left: 4px solid #66bb6a;
-    }
-
-    .expenses {
-      border-left: 4px solid #ef5350;
-    }
-
-    .pagination {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 8px;
-      margin-top: 30px;
-      flex-wrap: wrap;
-    }
-
-    .pagination a,
-    .pagination span {
-      font-family: 'TT Octosquares TRL', sans-serif;
-      background-color: #b7ab98;
-      color: #222;
-      font-weight: 600;
-      padding: 6px 12px;
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-      min-width: 32px;
-      height: 32px;
-      line-height: 20px;
-      text-align: center;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-
-    .pagination a.nav-btn {
-      min-width: 60px;
-      padding: 6px 10px;
-    }
-
-    .pagination a:hover {
-      background-color: #a3987c;
-    }
-
-    .pagination span.active {
-      background-color: #eee;
-      color: #121212;
-    }
-
-    .pagination a.disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      pointer-events: none;
-    }
-
     @media (max-width: 1200px) {
-      .summary-grid {
-        grid-template-columns: repeat(3, 1fr);
-      }
-      .filters {
-        flex-wrap: wrap;
+      .financial-summary {
+        gap: 1rem;
       }
     }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        width: 60px;
-      }
-      .sidebar h2 {
-        display: none;
-      }
-      .sidebar nav a {
-        padding: 12px 10px;
-        font-size: 0;
-        position: relative;
-      }
-      .sidebar nav a::after {
-        content: attr(data-tooltip);
-        position: absolute;
-        left: 60px;
-        top: 50%;
-        transform: translateY(-50%);
-        background-color: #333;
-        padding: 6px 10px;
-        border-radius: 4px;
-        white-space: nowrap;
-        opacity: 0;
-        color: white;
-        font-size: 14px;
-        transition: opacity 0.3s;
-      }
-      .sidebar nav a:hover::after {
-        opacity: 1;
-      }
-      .content {
-        margin-left: 60px;
-        padding: 20px;
-      }
-      .top-bar {
+    @media (max-width: 900px) {
+      .financial-summary {
         flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
+        align-items: center;
       }
-      .search-input, .btn-add {
+      .financial-card {
+        max-width: 95vw;
         width: 100%;
-        max-width: none;
-      }
-      .filters {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-      }
-      .filter-group {
-        min-width: 100%;
-      }
-      .btn-filter {
-        width: 100%;
-        min-width: 100%;
-      }
-      .summary-grid {
-        grid-template-columns: repeat(2, 1fr);
       }
     }
-
-    @media (max-width: 480px) {
-      .summary-grid {
-        grid-template-columns: 1fr;
+    @media (max-width: 600px) {
+      .financial-card {
+        min-width: 90vw;
+        max-width: 98vw;
+        padding: 1.2rem 0.7rem;
       }
     }
+    /* Hide old summary-grid/cards */
+    .summary-grid { display: none !important; }
   </style>
 </head>
 <body>
@@ -556,8 +425,6 @@
     <a href="/purchase" data-tooltip="Purchase">Purchase</a>
     <a href="/sales" data-tooltip="Sales">Sales</a>
     <a href="/billing" class="active" data-tooltip="Billing">Billing</a>
-    <a href="/stock" data-tooltip="Stock">Stock</a>
-    <a href="/reports" data-tooltip="Reports">Reports</a>
     <a href="/profile" data-tooltip="Profile">Profile</a>
   </nav>
 </aside>
@@ -570,50 +437,57 @@
     </a>
   </div>
   <!-- Financial Summary -->
-  <div class="summary-grid">
-    <div class="summary-card pending-sales">
-      <h3 class="summary-title">
-        <i data-lucide="shopping-cart" size="18"></i>Pending Sales
-      </h3>
-      <p class="summary-value" th:text="${pendingSalesCount}">5</p>
-      <div class="summary-trend">
-        <span th:text="${'$' + pendingSalesAmount}">$25,800</span>
+  <div class="financial-summary">
+    <div class="financial-card pending-sales">
+      <div class="financial-icon">
+        <i data-lucide="shopping-cart" size="18"></i>
+      </div>
+      <div class="financial-info">
+        <div class="financial-title">Pending Sales</div>
+        <div class="financial-value" th:text="${pendingSalesCount}">5</div>
+        <div class="summary-trend">
+          <span th:text="${'$' + pendingSalesAmount}">$25,800</span>
+        </div>
       </div>
     </div>
-    <div class="summary-card pending-purchases">
-      <h3 class="summary-title">
-        <i data-lucide="package" size="18"></i>Pending Purchases
-      </h3>
-      <p class="summary-value" th:text="${pendingPurchasesCount}">3</p>
-      <div class="summary-trend">
-        <span th:text="${'$' + pendingPurchasesAmount}">$18,450</span>
+    <div class="financial-card pending-purchases">
+      <div class="financial-icon">
+        <i data-lucide="package" size="18"></i>
+      </div>
+      <div class="financial-info">
+        <div class="financial-title">Pending Purchases</div>
+        <div class="financial-value" th:text="${pendingPurchasesCount}">3</div>
+        <div class="summary-trend">
+          <span th:text="${'$' + pendingPurchasesAmount}">$18,450</span>
+        </div>
       </div>
     </div>
-    <div class="summary-card balance">
-      <h3 class="summary-title">
-        <i data-lucide="wallet" size="18"></i>Balance
-      </h3>
-      <p class="summary-value" th:text="${'$' + balance}">$1,35,750</p>
+    <div class="financial-card balance">
+      <div class="financial-icon">
+        <i data-lucide="wallet" size="18"></i>
+      </div>
+      <div class="financial-info">
+        <div class="financial-title">Balance</div>
+        <div class="financial-value" th:text="${'$' + balance}">$1,35,750</div>
+      </div>
     </div>
-    <div class="summary-card profit">
-      <h3 class="summary-title">
-        <i data-lucide="bar-chart-2" size="18"></i>Profit
-      </h3>
-      <p class="summary-value" th:text="${'$' + profit}">$42,800</p>
-      <!--      <div class="summary-trend trend-up">-->
-      <!--        <i data-lucide="trending-up" size="14"></i>-->
-      <!--        <span>+12.5% this month</span>-->
-      <!--      </div>-->
+    <div class="financial-card profit">
+      <div class="financial-icon">
+        <i data-lucide="bar-chart-2" size="18"></i>
+      </div>
+      <div class="financial-info">
+        <div class="financial-title">Profit</div>
+        <div class="financial-value" th:text="${'$' + profit}">$42,800</div>
+      </div>
     </div>
-    <div class="summary-card expenses">
-      <h3 class="summary-title">
-        <i data-lucide="credit-card" size="18"></i>Expenses
-      </h3>
-      <p class="summary-value" th:text="${'$' + expenses}">$89,350</p>
-      <!--      <div class="summary-trend trend-down">-->
-      <!--        <i data-lucide="trending-down" size="14"></i>-->
-      <!--        <span>-3.8% this month</span>-->
-      <!--      </div>-->
+    <div class="financial-card expenses">
+      <div class="financial-icon">
+        <i data-lucide="credit-card" size="18"></i>
+      </div>
+      <div class="financial-info">
+        <div class="financial-title">Expenses</div>
+        <div class="financial-value" th:text="${'$' + expenses}">$89,350</div>
+      </div>
     </div>
   </div>
 
@@ -661,7 +535,6 @@
     <table>
       <thead>
       <tr>
-        <th>ID</th>
         <th>Date</th>
         <th>Product</th>
         <th>Supplier</th>
@@ -673,7 +546,6 @@
       </thead>
       <tbody>
       <tr th:each="purchase : ${purchases}">
-        <td th:text="${purchase.id}"></td>
         <td th:text="${#temporals.format(purchase.purchaseDate, 'dd-MM-yyyy')}"></td>
         <td th:text="${purchase.productName}"></td>
         <td th:text="${purchase.supplierName}"></td>
@@ -697,7 +569,7 @@
         </td>
       </tr>
       <tr th:if="${purchases == null or purchases.isEmpty()}">
-        <td colspan="8" style="text-align: center;">No purchase transactions found</td>
+        <td colspan="7" style="text-align: center;">No purchase transactions found</td>
       </tr>
       </tbody>
     </table>
@@ -757,7 +629,6 @@
     <table>
       <thead>
       <tr>
-        <th>ID</th>
         <th>Date</th>
         <th>Product</th>
         <th>Customer</th>
@@ -769,7 +640,6 @@
       </thead>
       <tbody>
       <tr th:each="sale : ${sales}">
-        <td th:text="${sale.id}"></td>
         <td th:text="${#temporals.format(sale.salesDate, 'dd-MM-yyyy')}"></td>
         <td th:text="${sale.productName}"></td>
         <td th:text="${sale.customerName}"></td>
@@ -793,7 +663,7 @@
         </td>
       </tr>
       <tr th:if="${sales == null or sales.isEmpty()}">
-        <td colspan="8" style="text-align: center;">No sales transactions found</td>
+        <td colspan="7" style="text-align: center;">No sales transactions found</td>
       </tr>
       </tbody>
     </table>
@@ -815,5 +685,3 @@
 </script>
 </body>
 </html>
-
-

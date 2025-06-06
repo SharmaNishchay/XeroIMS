@@ -460,6 +460,13 @@ public class BillingService {
     public List<YearMonth> findAllMonthYearsForOauthUser(OauthUser oauthUser) {
         return billingRepository.findDistinctMonthYearsByOauthUser(oauthUser);
     }
+    public static class InsufficientFundsException extends RuntimeException {
+        public InsufficientFundsException(String message) { super(message); }
+    }
+    public static class InsufficientProductException extends RuntimeException {
+        public InsufficientProductException(String message) { super(message); }
+    }
+
     @Transactional
     public boolean updatePurchaseStatus(Long purchaseId, Status status) {
         if (purchaseId == null || status == null) {
@@ -472,6 +479,15 @@ public class BillingService {
             Purchase purchase = purchaseOpt.get();
 
             if (purchase.getStatus() == Status.PENDING) {
+                if (status == Status.COMPLETED) {
+                    User user = purchase.getUser();
+                    OauthUser oauthUser = purchase.getOauthUser();
+                    BigDecimal currentBalance = user != null ? calculateCurrentBalance(user) : calculateCurrentBalance(oauthUser);
+                    BigDecimal amount = purchase.getTotalPrice();
+                    if (currentBalance.compareTo(amount) < 0) {
+                        throw new InsufficientFundsException("Insufficient Funds");
+                    }
+                }
                 purchase.setStatus(status);
                 purchaseRepository.save(purchase);
 
@@ -523,7 +539,7 @@ public class BillingService {
             if (sale.getStatus() == Status.PENDING) {
                 if (status == Status.COMPLETED) {
                     if (!hasEnoughStockForSale(sale)) {
-                        return false;
+                        throw new InsufficientProductException("Insufficient Product");
                     }
                     updateProductStockForSaleApproval(sale);
                     // Update billing cards
