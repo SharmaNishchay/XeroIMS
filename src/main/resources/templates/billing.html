@@ -563,8 +563,12 @@
 </aside>
 
 <main class="content">
-  <h1>Billing</h1>
-
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+    <h1>Billing</h1>
+    <a th:href="@{/billing/add-balance}">
+      <button class="btn-add"><i data-lucide="plus-circle" size="14"></i> Add Balance</button>
+    </a>
+  </div>
   <!-- Financial Summary -->
   <div class="summary-grid">
     <div class="summary-card pending-sales">
@@ -811,5 +815,6 @@
 </script>
 </body>
 </html>
+
 
 

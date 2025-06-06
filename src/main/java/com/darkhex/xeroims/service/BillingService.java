@@ -477,12 +477,29 @@ public class BillingService {
 
                 if (status == Status.COMPLETED) {
                     updateProductStockForPurchaseApproval(purchase);
-                }
-
-                if (purchase.getUser() != null) {
-                    createOrUpdateDailyRecord(purchase.getUser());
-                } else if (purchase.getOauthUser() != null) {
-                    createOrUpdateDailyRecord(purchase.getOauthUser());
+                    // Update billing cards
+                    User user = purchase.getUser();
+                    OauthUser oauthUser = purchase.getOauthUser();
+                    Optional<Billing> latestBilling = user != null
+                        ? billingRepository.findFirstByUserOrderByRecordDateDesc(user)
+                        : billingRepository.findFirstByOauthUserOrderByRecordDateDesc(oauthUser);
+                    BigDecimal amount = purchase.getTotalPrice();
+                    BigDecimal prevBalance = latestBilling.map(Billing::getBalance).orElse(BigDecimal.ZERO);
+                    BigDecimal prevProfit = latestBilling.map(Billing::getProfit).orElse(BigDecimal.ZERO);
+                    BigDecimal prevExpenses = latestBilling.map(Billing::getExpenses).orElse(BigDecimal.ZERO);
+                    Billing newBilling = new Billing();
+                    newBilling.setRecordDate(LocalDate.now());
+                    newBilling.setMonthYear(YearMonth.now());
+                    newBilling.setBalance(prevBalance.subtract(amount));
+                    newBilling.setProfit(prevProfit.subtract(amount));
+                    newBilling.setExpenses(prevExpenses.add(amount));
+                    newBilling.setPendingSalesCount(latestBilling.map(Billing::getPendingSalesCount).orElse(0));
+                    newBilling.setPendingSalesAmount(latestBilling.map(Billing::getPendingSalesAmount).orElse(BigDecimal.ZERO));
+                    newBilling.setPendingPurchasesCount(latestBilling.map(Billing::getPendingPurchasesCount).orElse(0));
+                    newBilling.setPendingPurchasesAmount(latestBilling.map(Billing::getPendingPurchasesAmount).orElse(BigDecimal.ZERO));
+                    if (user != null) newBilling.setUser(user);
+                    if (oauthUser != null) newBilling.setOauthUser(oauthUser);
+                    billingRepository.save(newBilling);
                 }
 
                 return true;
@@ -490,20 +507,6 @@ public class BillingService {
         }
 
         return false;
-    }
-
-    @Transactional
-    protected void updateProductStockForPurchaseApproval(Purchase purchase) {
-        Product product = purchase.getProduct();
-        if (product != null) {
-            Integer currentQty = product.getQuantity();
-            if (currentQty == null) {
-                currentQty = 0;
-            }
-            product.setQuantity(currentQty + purchase.getQuantity());
-
-            productRepository.save(product);
-        }
     }
 
     @Transactional
@@ -523,16 +526,33 @@ public class BillingService {
                         return false;
                     }
                     updateProductStockForSaleApproval(sale);
+                    // Update billing cards
+                    User user = sale.getUser();
+                    OauthUser oauthUser = sale.getOauthUser();
+                    Optional<Billing> latestBilling = user != null
+                        ? billingRepository.findFirstByUserOrderByRecordDateDesc(user)
+                        : billingRepository.findFirstByOauthUserOrderByRecordDateDesc(oauthUser);
+                    BigDecimal amount = sale.getTotalPrice();
+                    BigDecimal prevBalance = latestBilling.map(Billing::getBalance).orElse(BigDecimal.ZERO);
+                    BigDecimal prevProfit = latestBilling.map(Billing::getProfit).orElse(BigDecimal.ZERO);
+                    BigDecimal prevExpenses = latestBilling.map(Billing::getExpenses).orElse(BigDecimal.ZERO);
+                    Billing newBilling = new Billing();
+                    newBilling.setRecordDate(LocalDate.now());
+                    newBilling.setMonthYear(YearMonth.now());
+                    newBilling.setBalance(prevBalance.add(amount));
+                    newBilling.setProfit(prevProfit.add(amount));
+                    newBilling.setExpenses(prevExpenses); // no change
+                    newBilling.setPendingSalesCount(latestBilling.map(Billing::getPendingSalesCount).orElse(0));
+                    newBilling.setPendingSalesAmount(latestBilling.map(Billing::getPendingSalesAmount).orElse(BigDecimal.ZERO));
+                    newBilling.setPendingPurchasesCount(latestBilling.map(Billing::getPendingPurchasesCount).orElse(0));
+                    newBilling.setPendingPurchasesAmount(latestBilling.map(Billing::getPendingPurchasesAmount).orElse(BigDecimal.ZERO));
+                    if (user != null) newBilling.setUser(user);
+                    if (oauthUser != null) newBilling.setOauthUser(oauthUser);
+                    billingRepository.save(newBilling);
                 }
 
                 sale.setStatus(status);
                 saleRepository.save(sale);
-
-                if (sale.getUser() != null) {
-                    createOrUpdateDailyRecord(sale.getUser());
-                } else if (sale.getOauthUser() != null) {
-                    createOrUpdateDailyRecord(sale.getOauthUser());
-                }
 
                 return true;
             }
@@ -568,6 +588,19 @@ public class BillingService {
         }
     }
 
+    @Transactional
+    protected void updateProductStockForPurchaseApproval(Purchase purchase) {
+        Product product = purchase.getProduct();
+        if (product != null) {
+            Integer currentQty = product.getQuantity();
+            if (currentQty == null) {
+                currentQty = 0;
+            }
+            product.setQuantity(currentQty + purchase.getQuantity());
+            productRepository.save(product);
+        }
+    }
+
 
     public BillingDashboardMetrics getFinancialDashboardMetrics(User user, OauthUser oauthUser) {
         BillingDashboardMetrics metrics = new BillingDashboardMetrics();
@@ -577,11 +610,23 @@ public class BillingService {
         metrics.setPendingPurchasesCount(countPendingPurchases(user, oauthUser));
         metrics.setPendingPurchasesAmount(calculatePendingPurchasesAmount(user, oauthUser));
 
-        LocalDate today = LocalDate.now();
-        metrics.setBalance(calculateBalanceForDate(today, user, oauthUser));
-        metrics.setProfit(calculateProfitForDate(today, user, oauthUser));
-        metrics.setExpenses(calculateExpensesForDate(today, user, oauthUser));
+        // Use the latest Billing record's balance, profit, and expenses
+        Optional<Billing> latestBilling = user != null
+            ? billingRepository.findFirstByUserOrderByRecordDateDesc(user)
+            : billingRepository.findFirstByOauthUserOrderByRecordDateDesc(oauthUser);
+        if (latestBilling.isPresent()) {
+            Billing billing = latestBilling.get();
+            metrics.setBalance(billing.getBalance());
+            metrics.setProfit(billing.getProfit());
+            metrics.setExpenses(billing.getExpenses());
+        } else {
+            metrics.setBalance(BigDecimal.ZERO);
+            metrics.setProfit(BigDecimal.ZERO);
+            metrics.setExpenses(BigDecimal.ZERO);
+        }
 
+        // Percentage changes can remain as before
+        LocalDate today = LocalDate.now();
         YearMonth currentMonth = YearMonth.now();
         YearMonth previousMonth = currentMonth.minusMonths(1);
 
@@ -687,5 +732,31 @@ public class BillingService {
         public void setBalancePercentageChange(BigDecimal balancePercentageChange) {
             this.balancePercentageChange = balancePercentageChange;
         }
+    }
+
+    @Transactional
+    public void addBalance(User user, OauthUser oauthUser, BigDecimal amount) {
+        if (user == null && oauthUser == null) return;
+        Billing latestBilling = null;
+        if (user != null) {
+            latestBilling = billingRepository.findFirstByUserOrderByRecordDateDesc(user).orElse(null);
+        } else if (oauthUser != null) {
+            latestBilling = billingRepository.findFirstByOauthUserOrderByRecordDateDesc(oauthUser).orElse(null);
+        }
+        BigDecimal currentBalance = latestBilling != null && latestBilling.getBalance() != null ? latestBilling.getBalance() : BigDecimal.ZERO;
+        BigDecimal newBalance = currentBalance.add(amount);
+        Billing newBilling = new Billing();
+        newBilling.setRecordDate(LocalDate.now());
+        newBilling.setMonthYear(YearMonth.now());
+        newBilling.setBalance(newBalance);
+        newBilling.setProfit(latestBilling != null ? latestBilling.getProfit() : BigDecimal.ZERO);
+        newBilling.setExpenses(latestBilling != null ? latestBilling.getExpenses() : BigDecimal.ZERO);
+        newBilling.setPendingSalesCount(latestBilling != null ? latestBilling.getPendingSalesCount() : 0);
+        newBilling.setPendingSalesAmount(latestBilling != null ? latestBilling.getPendingSalesAmount() : BigDecimal.ZERO);
+        newBilling.setPendingPurchasesCount(latestBilling != null ? latestBilling.getPendingPurchasesCount() : 0);
+        newBilling.setPendingPurchasesAmount(latestBilling != null ? latestBilling.getPendingPurchasesAmount() : BigDecimal.ZERO);
+        if (user != null) newBilling.setUser(user);
+        if (oauthUser != null) newBilling.setOauthUser(oauthUser);
+        billingRepository.save(newBilling);
     }
 }
