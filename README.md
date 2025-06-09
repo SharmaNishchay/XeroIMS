@@ -8,7 +8,7 @@
 
 ## 🎥 Live Demo
 
-[![Watch Demo] https://youtu.be/9xiHZxbinIg
+[Watch Demo] https://youtu.be/9xiHZxbinIg
 
 📽️ **Click the link above to view the walkthrough of the system.**
 
