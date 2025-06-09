@@ -37,7 +37,7 @@ public class BillingService {
 
     public BigDecimal calculateCurrentBalance(User user) {
         if (user != null) {
-            Optional<Billing> latestBilling = billingRepository.findFirstByUserOrderByRecordDateDesc(user);
+            Optional<Billing> latestBilling = billingRepository.findTopByUserOrderByIdDesc(user);
             return latestBilling.map(Billing::getBalance).orElse(BigDecimal.ZERO);
         }
         return BigDecimal.ZERO;
@@ -46,7 +46,7 @@ public class BillingService {
 
     public BigDecimal calculateCurrentBalance(OauthUser oauthUser) {
         if (oauthUser != null) {
-            Optional<Billing> latestBilling = billingRepository.findFirstByOauthUserOrderByRecordDateDesc(oauthUser);
+            Optional<Billing> latestBilling = billingRepository.findTopByOauthUserOrderByIdDesc(oauthUser);
             return latestBilling.map(Billing::getBalance).orElse(BigDecimal.ZERO);
         }
         return BigDecimal.ZERO;
@@ -54,7 +54,7 @@ public class BillingService {
 
     public BigDecimal calculateCurrentProfit(User user) {
         if (user != null) {
-            Optional<Billing> latestBilling = billingRepository.findFirstByUserOrderByRecordDateDesc(user);
+            Optional<Billing> latestBilling = billingRepository.findTopByUserOrderByIdDesc(user);
             return latestBilling.map(Billing::getProfit).orElse(BigDecimal.ZERO);
         }
         return BigDecimal.ZERO;
@@ -63,7 +63,7 @@ public class BillingService {
 
     public BigDecimal calculateCurrentProfit(OauthUser oauthUser) {
         if (oauthUser != null) {
-            Optional<Billing> latestBilling = billingRepository.findFirstByOauthUserOrderByRecordDateDesc(oauthUser);
+            Optional<Billing> latestBilling = billingRepository.findTopByOauthUserOrderByIdDesc(oauthUser);
             return latestBilling.map(Billing::getProfit).orElse(BigDecimal.ZERO);
         }
         return BigDecimal.ZERO;
@@ -72,7 +72,7 @@ public class BillingService {
 
     public BigDecimal calculateCurrentExpenses(User user) {
         if (user != null) {
-            Optional<Billing> latestBilling = billingRepository.findFirstByUserOrderByRecordDateDesc(user);
+            Optional<Billing> latestBilling = billingRepository.findTopByUserOrderByIdDesc(user);
             return latestBilling.map(Billing::getExpenses).orElse(BigDecimal.ZERO);
         }
         return BigDecimal.ZERO;
@@ -81,7 +81,7 @@ public class BillingService {
 
     public BigDecimal calculateCurrentExpenses(OauthUser oauthUser) {
         if (oauthUser != null) {
-            Optional<Billing> latestBilling = billingRepository.findFirstByOauthUserOrderByRecordDateDesc(oauthUser);
+            Optional<Billing> latestBilling = billingRepository.findTopByOauthUserOrderByIdDesc(oauthUser);
             return latestBilling.map(Billing::getExpenses).orElse(BigDecimal.ZERO);
         }
         return BigDecimal.ZERO;
@@ -487,19 +487,12 @@ public class BillingService {
                     if (currentBalance.compareTo(amount) < 0) {
                         throw new InsufficientFundsException("Insufficient Funds");
                     }
-                }
-                purchase.setStatus(status);
-                purchaseRepository.save(purchase);
 
-                if (status == Status.COMPLETED) {
                     updateProductStockForPurchaseApproval(purchase);
-                    // Update billing cards
-                    User user = purchase.getUser();
-                    OauthUser oauthUser = purchase.getOauthUser();
+                    // Update billing cards - using ID-based query for the latest data
                     Optional<Billing> latestBilling = user != null
-                        ? billingRepository.findFirstByUserOrderByRecordDateDesc(user)
-                        : billingRepository.findFirstByOauthUserOrderByRecordDateDesc(oauthUser);
-                    BigDecimal amount = purchase.getTotalPrice();
+                        ? billingRepository.findTopByUserOrderByIdDesc(user)
+                        : billingRepository.findTopByOauthUserOrderByIdDesc(oauthUser);
                     BigDecimal prevBalance = latestBilling.map(Billing::getBalance).orElse(BigDecimal.ZERO);
                     BigDecimal prevProfit = latestBilling.map(Billing::getProfit).orElse(BigDecimal.ZERO);
                     BigDecimal prevExpenses = latestBilling.map(Billing::getExpenses).orElse(BigDecimal.ZERO);
@@ -517,6 +510,9 @@ public class BillingService {
                     if (oauthUser != null) newBilling.setOauthUser(oauthUser);
                     billingRepository.save(newBilling);
                 }
+
+                purchase.setStatus(status);
+                purchaseRepository.save(purchase);
 
                 return true;
             }
@@ -542,12 +538,12 @@ public class BillingService {
                         throw new InsufficientProductException("Insufficient Product");
                     }
                     updateProductStockForSaleApproval(sale);
-                    // Update billing cards
+                    // Update billing cards using ID-based query for the latest data
                     User user = sale.getUser();
                     OauthUser oauthUser = sale.getOauthUser();
                     Optional<Billing> latestBilling = user != null
-                        ? billingRepository.findFirstByUserOrderByRecordDateDesc(user)
-                        : billingRepository.findFirstByOauthUserOrderByRecordDateDesc(oauthUser);
+                        ? billingRepository.findTopByUserOrderByIdDesc(user)
+                        : billingRepository.findTopByOauthUserOrderByIdDesc(oauthUser);
                     BigDecimal amount = sale.getTotalPrice();
                     BigDecimal prevBalance = latestBilling.map(Billing::getBalance).orElse(BigDecimal.ZERO);
                     BigDecimal prevProfit = latestBilling.map(Billing::getProfit).orElse(BigDecimal.ZERO);
@@ -565,10 +561,13 @@ public class BillingService {
                     if (user != null) newBilling.setUser(user);
                     if (oauthUser != null) newBilling.setOauthUser(oauthUser);
                     billingRepository.save(newBilling);
-                }
 
-                sale.setStatus(status);
-                saleRepository.save(sale);
+                    sale.setStatus(status);
+                    saleRepository.save(sale);
+                } else {
+                    sale.setStatus(status);
+                    saleRepository.save(sale);
+                }
 
                 return true;
             }
@@ -626,10 +625,10 @@ public class BillingService {
         metrics.setPendingPurchasesCount(countPendingPurchases(user, oauthUser));
         metrics.setPendingPurchasesAmount(calculatePendingPurchasesAmount(user, oauthUser));
 
-        // Use the latest Billing record's balance, profit, and expenses
+        // Use the latest Billing record's balance, profit, and expenses by highest ID
         Optional<Billing> latestBilling = user != null
-            ? billingRepository.findFirstByUserOrderByRecordDateDesc(user)
-            : billingRepository.findFirstByOauthUserOrderByRecordDateDesc(oauthUser);
+            ? billingRepository.findTopByUserOrderByIdDesc(user)
+            : billingRepository.findTopByOauthUserOrderByIdDesc(oauthUser);
         if (latestBilling.isPresent()) {
             Billing billing = latestBilling.get();
             metrics.setBalance(billing.getBalance());
@@ -753,26 +752,43 @@ public class BillingService {
     @Transactional
     public void addBalance(User user, OauthUser oauthUser, BigDecimal amount) {
         if (user == null && oauthUser == null) return;
-        Billing latestBilling = null;
-        if (user != null) {
-            latestBilling = billingRepository.findFirstByUserOrderByRecordDateDesc(user).orElse(null);
-        } else if (oauthUser != null) {
-            latestBilling = billingRepository.findFirstByOauthUserOrderByRecordDateDesc(oauthUser).orElse(null);
-        }
-        BigDecimal currentBalance = latestBilling != null && latestBilling.getBalance() != null ? latestBilling.getBalance() : BigDecimal.ZERO;
+
+        // Use ID-based query to get the latest billing record
+        Optional<Billing> latestBillingOpt = user != null
+            ? billingRepository.findTopByUserOrderByIdDesc(user)
+            : billingRepository.findTopByOauthUserOrderByIdDesc(oauthUser);
+
+        BigDecimal currentBalance = latestBillingOpt.map(Billing::getBalance).orElse(BigDecimal.ZERO);
         BigDecimal newBalance = currentBalance.add(amount);
+
         Billing newBilling = new Billing();
         newBilling.setRecordDate(LocalDate.now());
         newBilling.setMonthYear(YearMonth.now());
         newBilling.setBalance(newBalance);
-        newBilling.setProfit(latestBilling != null ? latestBilling.getProfit() : BigDecimal.ZERO);
-        newBilling.setExpenses(latestBilling != null ? latestBilling.getExpenses() : BigDecimal.ZERO);
-        newBilling.setPendingSalesCount(latestBilling != null ? latestBilling.getPendingSalesCount() : 0);
-        newBilling.setPendingSalesAmount(latestBilling != null ? latestBilling.getPendingSalesAmount() : BigDecimal.ZERO);
-        newBilling.setPendingPurchasesCount(latestBilling != null ? latestBilling.getPendingPurchasesCount() : 0);
-        newBilling.setPendingPurchasesAmount(latestBilling != null ? latestBilling.getPendingPurchasesAmount() : BigDecimal.ZERO);
+
+        // Preserve the existing profit and expenses values
+        if (latestBillingOpt.isPresent()) {
+            Billing latestBilling = latestBillingOpt.get();
+            // Keep the same profit and expenses values
+            newBilling.setProfit(latestBilling.getProfit());
+            newBilling.setExpenses(latestBilling.getExpenses());
+            newBilling.setPendingSalesCount(latestBilling.getPendingSalesCount());
+            newBilling.setPendingSalesAmount(latestBilling.getPendingSalesAmount());
+            newBilling.setPendingPurchasesCount(latestBilling.getPendingPurchasesCount());
+            newBilling.setPendingPurchasesAmount(latestBilling.getPendingPurchasesAmount());
+        } else {
+            // If no previous record, set default values
+            newBilling.setProfit(BigDecimal.ZERO);
+            newBilling.setExpenses(BigDecimal.ZERO);
+            newBilling.setPendingSalesCount(0);
+            newBilling.setPendingSalesAmount(BigDecimal.ZERO);
+            newBilling.setPendingPurchasesCount(0);
+            newBilling.setPendingPurchasesAmount(BigDecimal.ZERO);
+        }
+
         if (user != null) newBilling.setUser(user);
         if (oauthUser != null) newBilling.setOauthUser(oauthUser);
         billingRepository.save(newBilling);
     }
 }
+

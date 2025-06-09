@@ -23,6 +23,9 @@ public interface BillingRepository extends JpaRepository<Billing, Long> {
     Optional<Billing> findFirstByUserOrderByRecordDateDesc(User user);
     Optional<Billing> findFirstByOauthUserOrderByRecordDateDesc(OauthUser oauthUser);
 
+    Optional<Billing> findTopByUserOrderByIdDesc(User user);
+    Optional<Billing> findTopByOauthUserOrderByIdDesc(OauthUser oauthUser);
+
     List<Billing> findByMonthYearAndUser(YearMonth monthYear, User user);
     List<Billing> findByMonthYearAndOauthUser(YearMonth monthYear, OauthUser oauthUser);
 
